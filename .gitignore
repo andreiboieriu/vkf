@@ -1,2 +1,8 @@
 .cache/
 build/
+
+shaders/*.spv
+
+# nix
+.direnv/
+.envrc
