@@ -118,8 +118,15 @@ void Device::pickPhysicalDevice() {
 
   for (const auto &device : devices) {
     if (isDeviceSuitable(device)) {
+      VkPhysicalDeviceProperties deviceProperties{};
+      vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+      // force dedicated gpu
+      if (deviceProperties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+        continue;
+
       physicalDevice = device;
-      // break;
+      break;
     }
   }
 
