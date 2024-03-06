@@ -195,3 +195,7 @@ void Pipeline::createShaderModule(const std::vector<char>& code,
         throw std::runtime_error("failed to create shader module");
     }
 }
+
+void Pipeline::bind(VkCommandBuffer commandBuffer) {
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline);
+}
