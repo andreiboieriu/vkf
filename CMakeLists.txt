@@ -8,6 +8,10 @@ project(${NAME} VERSION 1.0.0)
 find_package(Vulkan REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 
+add_compile_options(
+  "$<$<COMPILE_LANGUAGE:CXX>:-g>"
+)
+
 # find source files
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
