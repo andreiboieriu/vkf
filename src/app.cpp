@@ -7,27 +7,27 @@
 App::App() {
     mWindow = std::make_shared<Window>(WIDTH, HEIGHT, NAME);
     mDevice = std::make_shared<Device>(mWindow);
-    mSwapChain = std::make_shared<SwapChain>(mDevice, mWindow->getExtent());
+    mSwapChain = std::make_shared<SwapChain>(mDevice, mWindow->GetExtent());
 
-    createPipelineLayout();
-    createPipeline();
-    createCommandBuffers();
+    CreatePipelineLayout();
+    CreatePipeline();
+    CreateCommandBuffers();
 }
 
 App::~App() {
-    vkDestroyPipelineLayout(mDevice->device(), mPipelineLayout, nullptr);
+    vkDestroyPipelineLayout(mDevice->GetDevice(), mPipelineLayout, nullptr);
 }
 
-void App::run() {
-    while (!mWindow->shouldClose()) {
-        mWindow->pollEvents();
-        drawFrame();
+void App::Run() {
+    while (!mWindow->ShouldClose()) {
+        mWindow->PollEvents();
+        DrawFrame();
     }
 
-    vkDeviceWaitIdle(mDevice->device());
+    vkDeviceWaitIdle(mDevice->GetDevice());
 }
 
-void App::createPipelineLayout() {
+void App::CreatePipelineLayout() {
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 0;
@@ -35,14 +35,15 @@ void App::createPipelineLayout() {
     pipelineLayoutInfo.pushConstantRangeCount = 0;
     pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
-    if (vkCreatePipelineLayout(mDevice->device(), &pipelineLayoutInfo, nullptr, &mPipelineLayout) != VK_SUCCESS) {
+    if (vkCreatePipelineLayout(mDevice->GetDevice(), &pipelineLayoutInfo, nullptr, &mPipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create pipeline layout");
     }
 }
 
-void App::createPipeline() {
-    auto pipelineConfig = Pipeline::defaultConfigInfo(mSwapChain->width(), mSwapChain->height());
-    pipelineConfig.renderPass = mSwapChain->getRenderPass();
+void App::CreatePipeline() {
+    auto pipelineConfig = Pipeline::DefaultConfigInfo(mSwapChain->GetWidth(),
+                                                      mSwapChain->GetHeight());
+    pipelineConfig.renderPass = mSwapChain->GetRenderPass();
     pipelineConfig.pipelineLayout = mPipelineLayout;
 
     mPipeline = std::make_shared<Pipeline>(mDevice,
@@ -51,16 +52,16 @@ void App::createPipeline() {
                                            pipelineConfig);
 }
 
-void App::createCommandBuffers() {
-    mCommandBuffers.resize(mSwapChain->imageCount());
+void App::CreateCommandBuffers() {
+    mCommandBuffers.resize(mSwapChain->GetImageCount());
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = mDevice->getCommandPool();
+    allocInfo.commandPool = mDevice->GetCommandPool();
     allocInfo.commandBufferCount = static_cast<uint32_t>(mCommandBuffers.size());
 
-    if (vkAllocateCommandBuffers(mDevice->device(), &allocInfo, mCommandBuffers.data()) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(mDevice->GetDevice(), &allocInfo, mCommandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers");
     }
 
@@ -74,11 +75,11 @@ void App::createCommandBuffers() {
 
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = mSwapChain->getRenderPass();
-        renderPassInfo.framebuffer = mSwapChain->getFrameBuffer(i);
+        renderPassInfo.renderPass = mSwapChain->GetRenderPass();
+        renderPassInfo.framebuffer = mSwapChain->GetFrameBuffer(i);
 
         renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = mSwapChain->getSwapChainExtent();
+        renderPassInfo.renderArea.extent = mSwapChain->GetSwapChainExtent();
 
         std::array<VkClearValue, 2> clearValues{};
         // clear color
@@ -92,7 +93,7 @@ void App::createCommandBuffers() {
 
         vkCmdBeginRenderPass(mCommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-        mPipeline->bind(mCommandBuffers[i]);
+        mPipeline->Bind(mCommandBuffers[i]);
         
         // draw 3 vertices in 1 instance
         // multiple instances can be used for instanced drawing
@@ -106,15 +107,15 @@ void App::createCommandBuffers() {
     }
 }
 
-void App::drawFrame() {
+void App::DrawFrame() {
     uint32_t imageIndex;
-    auto result = mSwapChain->acquireNextImage(&imageIndex);
+    auto result = mSwapChain->AcquireNextImage(&imageIndex);
 
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("failed to acquire swap chain image");
     }
 
-    result = mSwapChain->submitCommandBuffers(&mCommandBuffers[imageIndex], &imageIndex);
+    result = mSwapChain->SubmitCommandBuffers(&mCommandBuffers[imageIndex], &imageIndex);
 
     if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to submit command buffers");

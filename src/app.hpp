@@ -19,13 +19,13 @@ public:
     App();
     ~App();
 
-    void run();
+    void Run();
 
 private:
-    void createPipelineLayout();
-    void createPipeline();
-    void createCommandBuffers();
-    void drawFrame();
+    void CreatePipelineLayout();
+    void CreatePipeline();
+    void CreateCommandBuffers();
+    void DrawFrame();
 
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<Device> mDevice;

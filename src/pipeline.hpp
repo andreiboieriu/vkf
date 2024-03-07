@@ -31,18 +31,18 @@ public:
 
   ~Pipeline();
 
-  static Pipeline::ConfigInfo defaultConfigInfo(uint32_t width, uint32_t height);
+  static Pipeline::ConfigInfo DefaultConfigInfo(uint32_t width, uint32_t height);
 
-  void bind(VkCommandBuffer commandBuffer);
+  void Bind(VkCommandBuffer commandBuffer);
 
 private:
-  static std::vector<char> readFile(const std::string& filePath);
+  static std::vector<char> ReadFile(const std::string& filePath);
 
-  void createPipeline(const std::string& vertShaderPath,
+  void CreatePipeline(const std::string& vertShaderPath,
                       const std::string& fragShaderPath,
                       const Pipeline::ConfigInfo& configInfo);
 
-  void createShaderModule(const std::vector<char>& code,
+  void CreateShaderModule(const std::vector<char>& code,
                           VkShaderModule* shaderModule);
 
   std::shared_ptr<Device> mDevice;

@@ -7,7 +7,7 @@ Window::Window(const uint32_t width, const uint32_t height, std::string name) :
                mWidth(width),
                mHeight(height),
                mName(name) {
-    init();
+    Init();
 }
 
 Window::~Window() {
@@ -15,7 +15,7 @@ Window::~Window() {
     glfwTerminate();
 }
 
-void Window::init() {
+void Window::Init() {
     glfwInit();
 
     // set window hints
@@ -25,7 +25,7 @@ void Window::init() {
     mWindow = glfwCreateWindow(mWidth, mHeight, mName.c_str(), nullptr, nullptr);
 }
 
-void Window::createWindowSurface(VkInstance instance, VkSurfaceKHR *surface) {
+void Window::CreateWindowSurface(VkInstance instance, VkSurfaceKHR *surface) {
     if (glfwCreateWindowSurface(instance, mWindow, nullptr, surface) != VK_SUCCESS) {
         throw std::runtime_error("failed to create window surface");
     }

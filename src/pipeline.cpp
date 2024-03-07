@@ -11,17 +11,17 @@ Pipeline::Pipeline(std::shared_ptr<Device>& device,
                    const std::string& fragShaderPath,
                    const Pipeline::ConfigInfo& configInfo) :
                    mDevice(device) {
-    createPipeline(vertShaderPath, fragShaderPath, configInfo);
+    CreatePipeline(vertShaderPath, fragShaderPath, configInfo);
 }
 
 Pipeline::~Pipeline() {
-    vkDestroyShaderModule(mDevice->device(), mVertShaderModule, nullptr);
-    vkDestroyShaderModule(mDevice->device(), mFragShaderModule, nullptr);
+    vkDestroyShaderModule(mDevice->GetDevice(), mVertShaderModule, nullptr);
+    vkDestroyShaderModule(mDevice->GetDevice(), mFragShaderModule, nullptr);
 
-    vkDestroyPipeline(mDevice->device(), mPipeline, nullptr);
+    vkDestroyPipeline(mDevice->GetDevice(), mPipeline, nullptr);
 }
 
-Pipeline::ConfigInfo Pipeline::defaultConfigInfo(uint32_t width, uint32_t height) {
+Pipeline::ConfigInfo Pipeline::DefaultConfigInfo(uint32_t width, uint32_t height) {
     Pipeline::ConfigInfo configInfo{};
 
     configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -93,7 +93,7 @@ Pipeline::ConfigInfo Pipeline::defaultConfigInfo(uint32_t width, uint32_t height
     return configInfo;
 }
 
-std::vector<char> Pipeline::readFile(const std::string& filePath) {
+std::vector<char> Pipeline::ReadFile(const std::string& filePath) {
     std::ifstream file(filePath, std::ios::ate | std::ios::binary);
 
     if (!file.is_open()) {
@@ -110,17 +110,17 @@ std::vector<char> Pipeline::readFile(const std::string& filePath) {
     return buffer;
 }
 
-void Pipeline::createPipeline(const std::string& vertShaderPath,
+void Pipeline::CreatePipeline(const std::string& vertShaderPath,
                               const std::string& fragShaderPath,
                               const Pipeline::ConfigInfo& configInfo) {
     assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create pipeline: no pipelineLayout provided");
     assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create pipeline: no renderPass provided");
                 
-    auto vertCode = readFile(vertShaderPath);
-    auto fragCode = readFile(fragShaderPath);
+    auto vertCode = ReadFile(vertShaderPath);
+    auto fragCode = ReadFile(fragShaderPath);
 
-    createShaderModule(vertCode, &mVertShaderModule);
-    createShaderModule(fragCode, &mFragShaderModule);
+    CreateShaderModule(vertCode, &mVertShaderModule);
+    CreateShaderModule(fragCode, &mFragShaderModule);
 
     VkPipelineShaderStageCreateInfo shaderStages[2];
     shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -174,7 +174,7 @@ void Pipeline::createPipeline(const std::string& vertShaderPath,
     pipelineInfo.basePipelineIndex = -1;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(mDevice->device(),
+    if (vkCreateGraphicsPipelines(mDevice->GetDevice(),
                                   VK_NULL_HANDLE,
                                   1,
                                   &pipelineInfo,
@@ -184,18 +184,18 @@ void Pipeline::createPipeline(const std::string& vertShaderPath,
     }
 }
 
-void Pipeline::createShaderModule(const std::vector<char>& code,
+void Pipeline::CreateShaderModule(const std::vector<char>& code,
                                   VkShaderModule* shaderModule) {
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = code.size();
     createInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
-    if (vkCreateShaderModule(mDevice->device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
+    if (vkCreateShaderModule(mDevice->GetDevice(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
         throw std::runtime_error("failed to create shader module");
     }
 }
 
-void Pipeline::bind(VkCommandBuffer commandBuffer) {
+void Pipeline::Bind(VkCommandBuffer commandBuffer) {
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline);
 }

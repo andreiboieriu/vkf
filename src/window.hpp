@@ -11,22 +11,22 @@ public:
     Window(const uint32_t width, const uint32_t height, std::string name);
     ~Window();
 
-    bool shouldClose() {
+    bool ShouldClose() {
         return glfwWindowShouldClose(mWindow);
     }
 
-    void pollEvents() {
+    void PollEvents() {
         glfwPollEvents();
     }
 
-    void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
+    void CreateWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
-    VkExtent2D getExtent() {
+    VkExtent2D GetExtent() {
         return {mWidth, mHeight};
     }
 
 private:
-    void init();
+    void Init();
 
     GLFWwindow *mWindow;
     uint32_t mWidth;
