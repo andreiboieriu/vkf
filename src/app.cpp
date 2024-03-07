@@ -9,6 +9,8 @@ App::App() {
     mDevice = std::make_shared<Device>(mWindow);
     mSwapChain = std::make_shared<SwapChain>(mDevice, mWindow->GetExtent());
 
+    LoadModels();
+
     CreatePipelineLayout();
     CreatePipeline();
     CreateCommandBuffers();
@@ -94,10 +96,8 @@ void App::CreateCommandBuffers() {
         vkCmdBeginRenderPass(mCommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         mPipeline->Bind(mCommandBuffers[i]);
-        
-        // draw 3 vertices in 1 instance
-        // multiple instances can be used for instanced drawing
-        vkCmdDraw(mCommandBuffers[i], 3, 1, 0, 0);
+        mModel->Bind(mCommandBuffers[i]);
+        mModel->Draw(mCommandBuffers[i]);
 
         vkCmdEndRenderPass(mCommandBuffers[i]);
 
@@ -105,6 +105,16 @@ void App::CreateCommandBuffers() {
             throw std::runtime_error("failed to record command buffer");
         }
     }
+}
+
+void App::LoadModels() {
+    std::vector<Model::Vertex> vertices {
+        {glm::vec2(0.0f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f)},
+        {glm::vec2(0.5f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)},
+        {glm::vec2(-0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f)}
+    };
+
+    mModel = std::make_unique<Model>(mDevice, vertices);
 }
 
 void App::DrawFrame() {
