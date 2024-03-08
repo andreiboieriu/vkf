@@ -15,6 +15,7 @@ public:
     static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
     SwapChain(std::shared_ptr<Device>& device, VkExtent2D windowExtent);
+    SwapChain(std::shared_ptr<Device>& device, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous);
     ~SwapChain();
 
     SwapChain(const SwapChain &) = delete;
@@ -38,6 +39,7 @@ public:
     VkResult SubmitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 
 private:
+    void Init();
     void CreateSwapChain();
     void CreateImageViews();
     void CreateDepthResources();
@@ -68,6 +70,7 @@ private:
     VkExtent2D mWindowExtent;
 
     VkSwapchainKHR mSwapChain;
+    std::shared_ptr<SwapChain> mOldSwapChain;
 
     std::vector<VkSemaphore> mImageAvailableSemaphores;
     std::vector<VkSemaphore> mRenderFinishedSemaphores;

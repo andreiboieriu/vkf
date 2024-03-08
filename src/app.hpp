@@ -26,13 +26,16 @@ private:
     void CreatePipelineLayout();
     void CreatePipeline();
     void CreateCommandBuffers();
+    void FreeCommandBuffers();
     void LoadModels();
     void DrawFrame();
+    void RecreateSwapChain();
+    void RecordCommandBuffer(int imageIndex);
 
     std::shared_ptr<Window> mWindow;
     std::shared_ptr<Device> mDevice;
-    std::shared_ptr<Pipeline> mPipeline;
-    std::shared_ptr<SwapChain> mSwapChain;
+    std::unique_ptr<Pipeline> mPipeline;
+    std::unique_ptr<SwapChain> mSwapChain;
 
     VkPipelineLayout mPipelineLayout;
     std::vector<VkCommandBuffer> mCommandBuffers;
