@@ -2,14 +2,18 @@
 #include <cassert>
 #include <cstring>
 
-Model::Model(std::shared_ptr<Device>& device, const std::vector<Vertex>& vertices) :
+Model::Model(std::shared_ptr<Device>& device, const Builder& builder) :
              mDevice(device) {
-    CreateVertexBuffer(vertices);
+    CreateVertexBuffer(builder.vertices);
+    CreateIndexBuffer(builder.indices);
 }
 
 Model::~Model() {
     vkDestroyBuffer(mDevice->GetDevice(), mVertexBuffer, nullptr);
     vkFreeMemory(mDevice->GetDevice(), mVertexBufferMemory, nullptr);
+
+    vkDestroyBuffer(mDevice->GetDevice(), mIndexBuffer, nullptr);
+    vkFreeMemory(mDevice->GetDevice(), mIndexBufferMemory, nullptr);
 }
 
 std::vector<VkVertexInputBindingDescription> Model::Vertex::GetBindingDescriptions() {
@@ -41,10 +45,13 @@ void Model::Bind(VkCommandBuffer commandBuffer) {
     VkDeviceSize offsets[] = {0};
 
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
+
+    // index size can be optimized
+    vkCmdBindIndexBuffer(commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT32);
 }
 
 void Model::Draw(VkCommandBuffer commandBuffer) {
-    vkCmdDraw(commandBuffer, mVertexCount, 1, 0, 0);
+    vkCmdDrawIndexed(commandBuffer, mVertexCount, 1, 0, 0, 0);
 }
 
 void Model::CreateVertexBuffer(const std::vector<Vertex>& vertices) {
@@ -64,4 +71,22 @@ void Model::CreateVertexBuffer(const std::vector<Vertex>& vertices) {
     vkMapMemory(mDevice->GetDevice(), mVertexBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
     vkUnmapMemory(mDevice->GetDevice(), mVertexBufferMemory);
+}
+
+void Model::CreateIndexBuffer(const std::vector<uint32_t>& indices) {
+    mIndexCount = static_cast<uint32_t>(indices.size());
+
+    VkDeviceSize bufferSize = sizeof(indices[0]) * mIndexCount;
+
+    mDevice->CreateBuffer(
+        bufferSize,
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        mIndexBuffer,
+        mIndexBufferMemory);
+
+    void *data;
+    vkMapMemory(mDevice->GetDevice(), mIndexBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
+    vkUnmapMemory(mDevice->GetDevice(), mIndexBufferMemory);
 }
