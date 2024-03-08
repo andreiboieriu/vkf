@@ -15,6 +15,14 @@ public:
         return glfwWindowShouldClose(mWindow);
     }
 
+    bool WasResized() {
+        return mResized;
+    }
+
+    void ResetResizedFlag() {
+        mResized = false;
+    }
+
     void PollEvents() {
         glfwPollEvents();
     }
@@ -26,10 +34,12 @@ public:
     }
 
 private:
+    static void ResizeCallback(GLFWwindow *window, int width, int height);
     void Init();
 
     GLFWwindow *mWindow;
     uint32_t mWidth;
     uint32_t mHeight;
+    bool mResized = false;
     std::string mName;
 };
