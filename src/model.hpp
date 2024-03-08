@@ -19,7 +19,12 @@ public:
         static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
     };
 
-    Model(std::shared_ptr<Device>& device, const std::vector<Vertex>& vertices);
+    struct Builder {
+        std::vector<Vertex> vertices{};
+        std::vector<uint32_t> indices{};
+    };
+
+    Model(std::shared_ptr<Device>& device, const Builder& builder);
     ~Model();
 
     void Bind(VkCommandBuffer commandBuffer);
@@ -28,9 +33,15 @@ public:
 
 private:
     void CreateVertexBuffer(const std::vector<Vertex>& vertices);
+    void CreateIndexBuffer(const std::vector<uint32_t>& indices);
 
     std::shared_ptr<Device> mDevice;
+
     VkBuffer mVertexBuffer;
     VkDeviceMemory mVertexBufferMemory;
     uint32_t mVertexCount;
+
+    VkBuffer mIndexBuffer;
+    VkDeviceMemory mIndexBufferMemory;
+    uint32_t mIndexCount;
 };

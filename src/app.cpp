@@ -104,7 +104,11 @@ void App::LoadModels() {
         {glm::vec2(-0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f)}
     };
 
-    mModel = std::make_unique<Model>(mDevice, vertices);
+    std::vector<uint32_t> indices {0, 1, 2};
+
+    Model::Builder builder {vertices, indices};
+
+    mModel = std::make_unique<Model>(mDevice, builder);
 }
 
 void App::DrawFrame() {
@@ -163,9 +167,6 @@ void App::RecreateSwapChain() {
 }
 
 void App::RecordCommandBuffer(int imageIndex) {
-    static int frame = 0;
-    frame = (frame + 1) % 1000;
-
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
