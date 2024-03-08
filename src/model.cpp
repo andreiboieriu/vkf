@@ -60,17 +60,37 @@ void Model::CreateVertexBuffer(const std::vector<Vertex>& vertices) {
 
     VkDeviceSize bufferSize = sizeof(vertices[0]) * mVertexCount;
 
+    // create staging buffer
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+
     mDevice->CreateBuffer(
         bufferSize,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        stagingBuffer,
+        stagingBufferMemory);
+
+    // copy data to staging buffer
+    void *data;
+    vkMapMemory(mDevice->GetDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
+    vkUnmapMemory(mDevice->GetDevice(), stagingBufferMemory);
+
+    // create vertex buffer
+    mDevice->CreateBuffer(
+        bufferSize,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         mVertexBuffer,
         mVertexBufferMemory);
 
-    void *data;
-    vkMapMemory(mDevice->GetDevice(), mVertexBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-    vkUnmapMemory(mDevice->GetDevice(), mVertexBufferMemory);
+    // copy data from staging to vertex buffer
+    mDevice->CopyBuffer(stagingBuffer, mVertexBuffer, bufferSize);
+
+    // destroy staging buffer
+    vkDestroyBuffer(mDevice->GetDevice(), stagingBuffer, nullptr);
+    vkFreeMemory(mDevice->GetDevice(), stagingBufferMemory, nullptr);
 }
 
 void Model::CreateIndexBuffer(const std::vector<uint32_t>& indices) {
@@ -78,15 +98,35 @@ void Model::CreateIndexBuffer(const std::vector<uint32_t>& indices) {
 
     VkDeviceSize bufferSize = sizeof(indices[0]) * mIndexCount;
 
+    // create staging buffer
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+
     mDevice->CreateBuffer(
         bufferSize,
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        stagingBuffer,
+        stagingBufferMemory);
+
+    // copy data to staging buffer
+    void *data;
+    vkMapMemory(mDevice->GetDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
+    vkUnmapMemory(mDevice->GetDevice(), stagingBufferMemory);
+
+    // create vertex buffer
+    mDevice->CreateBuffer(
+        bufferSize,
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         mIndexBuffer,
         mIndexBufferMemory);
 
-    void *data;
-    vkMapMemory(mDevice->GetDevice(), mIndexBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-    vkUnmapMemory(mDevice->GetDevice(), mIndexBufferMemory);
+    // copy data from staging to vertex buffer
+    mDevice->CopyBuffer(stagingBuffer, mIndexBuffer, bufferSize);
+
+    // destroy staging buffer
+    vkDestroyBuffer(mDevice->GetDevice(), stagingBuffer, nullptr);
+    vkFreeMemory(mDevice->GetDevice(), stagingBufferMemory, nullptr);
 }
