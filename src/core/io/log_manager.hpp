@@ -38,7 +38,7 @@ public:
     template<typename T, typename... Args>
     void Assert(T condition, Args&&... args)
     {
-#ifdef NDEBUG
+#ifndef NDEBUG
         if (!condition)
         {
             Error(args...);
