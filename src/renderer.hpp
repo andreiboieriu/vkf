@@ -1,6 +1,6 @@
 #pragma once
 
-#include <window.hpp>
+#include <core/window/window.hpp>
 #include <device.hpp>
 #include <swap_chain.hpp>
 #include <model.hpp>

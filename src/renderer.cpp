@@ -2,6 +2,12 @@
 
 #include <array>
 
+#include "core/coordinator.hpp"
+
+
+extern Coordinator gCoordinator;
+
+
 Renderer::Renderer(std::shared_ptr<Window> window, std::shared_ptr<Device> device) :
                    mWindow(window), mDevice(device) {
     RecreateSwapChain();
@@ -61,7 +67,7 @@ void Renderer::RecreateSwapChain() {
 }
 
 VkCommandBuffer Renderer::BeginFrame() {
-    assert(!mIsFrameStarted && "Can't call begin frame while already in progress");
+    gCoordinator.Assert(!mIsFrameStarted, "Can't call begin frame while already in progress");
 
     auto result = mSwapChain->AcquireNextImage(&mCurrentImageIndex);
 
@@ -88,7 +94,7 @@ VkCommandBuffer Renderer::BeginFrame() {
 }
 
 void Renderer::EndFrame() {
-    assert(mIsFrameStarted && "Can't call end frame while frame is not in progress");
+    gCoordinator.Assert(mIsFrameStarted, "Can't call end frame while frame is not in progress");
     auto commandBuffer = GetCurrentCommandBuffer();
 
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
@@ -109,9 +115,9 @@ void Renderer::EndFrame() {
 }
 
 void Renderer::BeginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
-    assert(mIsFrameStarted &&
+    gCoordinator.Assert(mIsFrameStarted,
            "Can't call BeginSwapChainRenderPass while frame is not in progress");
-    assert(commandBuffer == GetCurrentCommandBuffer() &&
+    gCoordinator.Assert(commandBuffer == GetCurrentCommandBuffer(),
            "Can't begin render pass on command buffer from a different frame");
 
     VkRenderPassBeginInfo renderPassInfo{};
@@ -147,9 +153,9 @@ void Renderer::BeginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
 }
 
 void Renderer::EndSwapChainRenderPass(VkCommandBuffer commandBuffer) {
-    assert(mIsFrameStarted &&
+    gCoordinator.Assert(mIsFrameStarted,
            "Can't call EndSwapChainRenderPass while frame is not in progress");
-    assert(commandBuffer == GetCurrentCommandBuffer() &&
+    gCoordinator.Assert(commandBuffer == GetCurrentCommandBuffer(),
            "Can't end render pass on command buffer from a different frame");
 
     vkCmdEndRenderPass(commandBuffer);

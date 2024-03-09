@@ -1,4 +1,3 @@
-#include <cassert>
 #include <cstddef>
 #include <pipeline.hpp>
 #include <model.hpp>
@@ -6,6 +5,12 @@
 // std
 #include <fstream>
 #include <stdexcept>
+
+#include "core/coordinator.hpp"
+
+
+extern Coordinator gCoordinator;
+
 
 Pipeline::Pipeline(std::shared_ptr<Device>& device,
                    const std::string& vertShaderPath,
@@ -113,8 +118,10 @@ std::vector<char> Pipeline::ReadFile(const std::string& filePath) {
 void Pipeline::CreatePipeline(const std::string& vertShaderPath,
                               const std::string& fragShaderPath,
                               const Pipeline::ConfigInfo& configInfo) {
-    assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create pipeline: no pipelineLayout provided");
-    assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create pipeline: no renderPass provided");
+    gCoordinator.Assert(configInfo.pipelineLayout != VK_NULL_HANDLE,
+        "Cannot create pipeline: no pipelineLayout provided");
+    gCoordinator.Assert(configInfo.renderPass != VK_NULL_HANDLE,
+        "Cannot create pipeline: no renderPass provided");
                 
     auto vertCode = ReadFile(vertShaderPath);
     auto fragCode = ReadFile(fragShaderPath);

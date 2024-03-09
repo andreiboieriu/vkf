@@ -1,6 +1,6 @@
 #pragma once
 
-#include <window.hpp>
+#include <core/window/window.hpp>
 
 // std lib headers
 #include <vector>

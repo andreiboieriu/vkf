@@ -1,7 +1,12 @@
-#include <window.hpp>
+#include <core/window/window.hpp>
+#include "core/coordinator.hpp"
 
 // std
 #include <stdexcept>
+
+
+extern Coordinator gCoordinator;
+
 
 Window::Window(const uint32_t width, const uint32_t height, std::string name) :
                mWidth(width),
@@ -27,6 +32,20 @@ void Window::Init() {
 
     // set callbacks
     glfwSetFramebufferSizeCallback(mWindow, ResizeCallback);
+    glfwSetKeyCallback(mWindow, KeyCallback);
+}
+
+void Window::Update([[maybe_unused]] float dt) {
+    KeysBitset keys;
+
+    for (int key = GLFW_KEY_SPACE; key <= GLFW_KEY_LAST; ++key) {
+        keys[key] = glfwGetKey(mWindow, key);
+    }
+
+    gCoordinator.SendEvent(Event(Events::Input::Sync::Key::ID)
+                .SetParam(Events::Input::Sync::Key::KEYS, keys));
+
+    glfwPollEvents();
 }
 
 void Window::CreateWindowSurface(VkInstance instance, VkSurfaceKHR *surface) {
@@ -40,6 +59,15 @@ void Window::ResizeCallback(GLFWwindow *window, int width, int height) {
     engineWindow->mResized = true;
     engineWindow->mWidth = width;
     engineWindow->mHeight = height;
-
 }
 
+void Window::KeyCallback([[maybe_unused]] GLFWwindow* window,
+                        int key, int scancode, int action, int mods)
+{
+    gCoordinator.LogDebug("Key pressed: ", static_cast<char>(key));
+    gCoordinator.SendEvent(Event(Events::Input::Async::Key::ID)
+                .SetParam(Events::Input::Async::Key::KEY, key)
+                .SetParam(Events::Input::Async::Key::SCANCODE, scancode)
+                .SetParam(Events::Input::Async::Key::ACTION, action)
+                .SetParam(Events::Input::Async::Key::MODS, mods));
+}
