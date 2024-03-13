@@ -1,11 +1,6 @@
 #include <model.hpp>
+#include <cassert>
 #include <cstring>
-
-#include "core/coordinator.hpp"
-
-
-extern Coordinator gCoordinator;
-
 
 Model::Model(std::shared_ptr<Device>& device, const Builder& builder) :
              mDevice(device) {
@@ -61,7 +56,7 @@ void Model::Draw(VkCommandBuffer commandBuffer) {
 
 void Model::CreateVertexBuffer(const std::vector<Vertex>& vertices) {
     mVertexCount = static_cast<uint32_t>(vertices.size());
-    gCoordinator.Assert(mVertexCount >= 3, "Vertex count must be at least 3");
+    assert(mVertexCount >= 3 && "Vertex count must be at least 3");
 
     VkDeviceSize bufferSize = sizeof(vertices[0]) * mVertexCount;
 

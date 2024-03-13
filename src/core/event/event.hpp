@@ -22,7 +22,7 @@ public:
     template<typename T>
     Event& SetParam(ParamId id, T value)
     {
-        mData[id] = EventData(value, typeid(value).hash_code());
+        mData[id] = {value, typeid(value).hash_code()};
         return *this;
     }
 
