@@ -68,6 +68,8 @@ public:
         VkImage &image,
         VkDeviceMemory &imageMemory);
 
+    void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+
     VkPhysicalDeviceProperties properties;
 
 private:

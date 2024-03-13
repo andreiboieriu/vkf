@@ -3,7 +3,11 @@
 #include <device.hpp>
 #include <model.hpp>
 #include <renderer.hpp>
+<<<<<<< HEAD
 #include "core/window/window.hpp"
+=======
+#include <texture.hpp>
+>>>>>>> 8caa27b (adds textures)
 
 // std
 #include <memory>

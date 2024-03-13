@@ -60,4 +60,6 @@ void App::LoadModels() {
     Model::Builder builder {vertices, indices};
 
     mModel = std::make_shared<Model>(mDevice, builder);
+
+    auto tex = std::make_shared<Texture>(mDevice, "../assets/textures/chicken.jpg");
 }
