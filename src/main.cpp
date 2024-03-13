@@ -1,8 +1,14 @@
 #include <app.hpp>
 
+#include "core/coordinator.hpp"
+
 // std
 #include <iostream>
 #include <cstdlib>
+
+
+extern Coordinator gCoordinator;
+
 
 int main() {
     App app;
@@ -10,7 +16,7 @@ int main() {
     try {
         app.Run();
     } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        gCoordinator.LogError(e.what());
         return EXIT_FAILURE;
     }
 

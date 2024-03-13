@@ -1,5 +1,7 @@
 #include "swap_chain.hpp"
 
+#include "core/coordinator.hpp"
+
 // std
 #include <array>
 #include <cstdlib>
@@ -7,6 +9,10 @@
 #include <iostream>
 #include <limits>
 #include <stdexcept>
+
+
+extern Coordinator gCoordinator;
+
 
 SwapChain::SwapChain(std::shared_ptr<Device>& device, VkExtent2D extent) :
                      mDevice{device}, mWindowExtent{extent} {
@@ -387,7 +393,7 @@ VkSurfaceFormatKHR SwapChain::ChooseSwapSurfaceFormat(const std::vector<VkSurfac
 VkPresentModeKHR SwapChain::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
     for (const auto &availablePresentMode : availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-            std::cout << "Present mode: Mailbox" << std::endl;
+            gCoordinator.LogInfo("Present mode: Mailbox");
             return availablePresentMode;
         }
     }
@@ -399,7 +405,7 @@ VkPresentModeKHR SwapChain::ChooseSwapPresentMode(const std::vector<VkPresentMod
     //   }
     // }
 
-    std::cout << "Present mode: V-Sync" << std::endl;
+    gCoordinator.LogInfo("Present mode: V-Sync");
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 

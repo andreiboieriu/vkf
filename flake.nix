@@ -15,7 +15,7 @@
         devShells.default = mkShell {
           buildInputs = [
             cmake
-
+            glm
             glfw
             shaderc
             vulkan-headers

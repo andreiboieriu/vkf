@@ -1,9 +1,9 @@
 #pragma once
 
-#include <window.hpp>
 #include <device.hpp>
 #include <model.hpp>
 #include <renderer.hpp>
+#include "core/window/window.hpp"
 
 // std
 #include <memory>

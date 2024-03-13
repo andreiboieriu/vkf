@@ -1,8 +1,14 @@
-#include <app.hpp>
+#include <chrono>
 #include <memory>
 #include <stdexcept>
 
-#include <simple_render_system.hpp>
+#include "app.hpp"
+#include "simple_render_system.hpp"
+#include "core/coordinator.hpp"
+
+
+Coordinator gCoordinator(LogLevel::NORMAL);
+
 
 App::App() {
     mWindow = std::make_shared<Window>(WIDTH, HEIGHT, NAME);
@@ -19,9 +25,10 @@ App::~App() {
 void App::Run() {
     SimpleRenderSystem simple_render_system(mDevice, mRenderer->GetSwapChainRenderPass());
 
+    float dt = 0.0f;
     while (!mWindow->ShouldClose()) {
-        mWindow->PollEvents();
-        
+        auto startTime = std::chrono::high_resolution_clock::now();
+
         if (auto commandBuffer = mRenderer->BeginFrame()) {
             mRenderer->BeginSwapChainRenderPass(commandBuffer);
 
@@ -31,6 +38,11 @@ void App::Run() {
             mRenderer->EndSwapChainRenderPass(commandBuffer);
             mRenderer->EndFrame();
         }
+
+        mWindow->Update(dt);
+        auto stopTime = std::chrono::high_resolution_clock::now();
+        dt = std::chrono::duration<float, std::chrono::seconds::period>(stopTime - startTime).count();
+        gCoordinator.LogDebug("fps = ", 1.0f / dt);
     }
 
     vkDeviceWaitIdle(mDevice->GetDevice());

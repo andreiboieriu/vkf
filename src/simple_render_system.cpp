@@ -1,9 +1,14 @@
 #include <simple_render_system.hpp>
 
-
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+
+#include "core/coordinator.hpp"
+
+
+extern Coordinator gCoordinator;
+
 
 struct PushConstantData {
     glm::vec2 offset;
@@ -40,7 +45,7 @@ void SimpleRenderSystem::CreatePipelineLayout() {
 }
 
 void SimpleRenderSystem::CreatePipeline(VkRenderPass renderPass) {
-    assert(mPipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+    gCoordinator.Assert(mPipelineLayout != nullptr, "Cannot create pipeline before pipeline layout");
 
     Pipeline::ConfigInfo pipelineConfig{};
     Pipeline::DefaultConfigInfo(pipelineConfig);
