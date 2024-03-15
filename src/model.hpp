@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <device.hpp>
+#include <buffer.hpp>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -37,11 +38,9 @@ private:
 
     std::shared_ptr<Device> mDevice;
 
-    VkBuffer mVertexBuffer;
-    VkDeviceMemory mVertexBufferMemory;
+    std::unique_ptr<Buffer> mVertexBuffer;
     uint32_t mVertexCount;
 
-    VkBuffer mIndexBuffer;
-    VkDeviceMemory mIndexBufferMemory;
+    std::unique_ptr<Buffer> mIndexBuffer;
     uint32_t mIndexCount;
 };
