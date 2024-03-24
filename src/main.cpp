@@ -3,12 +3,9 @@
 #include "core/coordinator.hpp"
 
 // std
-#include <iostream>
 #include <cstdlib>
 
-
 extern Coordinator gCoordinator;
-
 
 int main() {
     App app;

@@ -54,8 +54,8 @@ public:
     }
 
 private:
-    std::queue<Entity> mAvailableEntities{};
-    std::array<Signature, MAX_ENTITIES> mSignatures{};
-    Entity mLivingEntityCount{};
+    std::queue<Entity> mAvailableEntities;
+    std::array<Signature, MAX_ENTITIES> mSignatures;
+    Entity mLivingEntityCount;
 };
 

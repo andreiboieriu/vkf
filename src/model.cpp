@@ -3,14 +3,15 @@
 
 #include "core/coordinator.hpp"
 
-
 extern Coordinator gCoordinator;
 
-
-Model::Model(std::shared_ptr<Device>& device, const Builder& builder) :
+Model::Model(std::shared_ptr<Device> device, const Builder& builder) :
              mDevice(device) {
     CreateVertexBuffer(builder.vertices);
     CreateIndexBuffer(builder.indices);
+
+    // device pointer no longer needed
+    mDevice = nullptr;
 }
 
 Model::~Model() {
@@ -27,7 +28,7 @@ std::vector<VkVertexInputBindingDescription> Model::Vertex::GetBindingDescriptio
 }
 
 std::vector<VkVertexInputAttributeDescription> Model::Vertex::GetAttributeDescriptions() {
-    std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2);
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions(3);
     attributeDescriptions[0].binding = 0;
     attributeDescriptions[0].location = 0;
     attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
@@ -37,6 +38,11 @@ std::vector<VkVertexInputAttributeDescription> Model::Vertex::GetAttributeDescri
     attributeDescriptions[1].location = 1;
     attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
     attributeDescriptions[1].offset = offsetof(Model::Vertex, color);
+
+    attributeDescriptions[2].binding = 0;
+    attributeDescriptions[2].location = 2;
+    attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[2].offset = offsetof(Model::Vertex, texCoord);
 
     return attributeDescriptions;
 }
@@ -52,7 +58,7 @@ void Model::Bind(VkCommandBuffer commandBuffer) {
 }
 
 void Model::Draw(VkCommandBuffer commandBuffer) {
-    vkCmdDrawIndexed(commandBuffer, mVertexCount, 1, 0, 0, 0);
+    vkCmdDrawIndexed(commandBuffer, mIndexCount, 1, 0, 0, 0);
 }
 
 void Model::CreateVertexBuffer(const std::vector<Vertex>& vertices) {

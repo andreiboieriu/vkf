@@ -20,7 +20,7 @@ public:
             && "Registering system more than once.");
 
 		auto system = std::make_shared<T>();
-		mSystems.insert({typeName, system});
+		mSystems[typeName] = system;
 		return system;
 	}
 
@@ -66,7 +66,7 @@ public:
 	}
 
 private:
-	std::unordered_map<const char*, Signature> mSignatures{};
-	std::unordered_map<const char*, std::shared_ptr<System>> mSystems{};
+	std::unordered_map<const char*, Signature> mSignatures;
+	std::unordered_map<const char*, std::shared_ptr<System>> mSystems;
 };
 

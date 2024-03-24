@@ -13,8 +13,9 @@
 class Model {
 public:
     struct Vertex {
-        glm::vec2 position;
-        glm::vec3 color;
+        alignas(8) glm::vec2 position;
+        alignas(16) glm::vec3 color;
+        alignas(8) glm::vec2 texCoord;
 
         static std::vector<VkVertexInputBindingDescription> GetBindingDescriptions();
         static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
@@ -25,7 +26,7 @@ public:
         std::vector<uint32_t> indices{};
     };
 
-    Model(std::shared_ptr<Device>& device, const Builder& builder);
+    Model(std::shared_ptr<Device> device, const Builder& builder);
     ~Model();
 
     void Bind(VkCommandBuffer commandBuffer);

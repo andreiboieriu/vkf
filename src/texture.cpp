@@ -6,8 +6,12 @@
 #include <stdexcept>
 #include <iostream>
 
+// TODO add customization options for different image samplers and views
+// TODO do something about device shared_ptr (maybe let resource manager
+// create all required vkobjects)
+
 Texture::Texture(std::shared_ptr<Device> device, const std::string& filePath) :
-                 mDevice(device) {
+                 mDevice(device) {    
     CreateImage(filePath);
     CreateImageView();
     CreateSampler();
