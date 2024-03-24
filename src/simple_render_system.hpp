@@ -3,20 +3,44 @@
 #include <pipeline.hpp>
 #include <device.hpp>
 #include <model.hpp>
+#include <texture.hpp>
+#include <descriptors.hpp>
+#include <buffer.hpp>
 
 // std
 #include <memory>
 #include <vector>
 
-class SimpleRenderSystem {
+#include <components/renderable.hpp>
+#include <core/system.hpp>
+
+class SimpleRenderSystem : public System {
 
 public:
-    SimpleRenderSystem(std::shared_ptr<Device> device, VkRenderPass renderPass);
+    struct Ubo {
+        alignas(16) glm::mat4 projection;
+        alignas(16) glm::mat4 view;
+    };
+
+    struct VertexPushData {
+        alignas(16) glm::mat4 model;
+    };
+
+    struct FragmentPushData {
+        alignas(16) glm::vec3 color;
+        alignas(16) float opacity;
+    };
+
+    SimpleRenderSystem();
     ~SimpleRenderSystem();
 
-    void RenderGameObjects(VkCommandBuffer commandBuffer, std::shared_ptr<Model> model);
+    void Init(std::shared_ptr<Device> device, VkRenderPass renderPass);
+
+    void Render(VkCommandBuffer commandBuffer, int frameIndex);
 
 private:
+    void CreateDescriptorSetLayouts();
+    void CreateUniformBuffers();
     void CreatePipelineLayout();
     void CreatePipeline(VkRenderPass renderPass);
 
@@ -24,4 +48,8 @@ private:
 
     std::unique_ptr<Pipeline> mPipeline;
     VkPipelineLayout mPipelineLayout;
+
+    std::unique_ptr<DescriptorSetLayout> mDescriptorSetLayout;
+
+    std::vector<std::unique_ptr<Buffer>> mUboBuffers;
 };

@@ -72,12 +72,16 @@ public:
 
     VkPhysicalDeviceProperties properties;
 
+    // dynamically linked functions
+    PFN_vkCmdPushDescriptorSetKHR vkCmdPushDescriptorSetKHR{ VK_NULL_HANDLE };
+    
 private:
     void CreateInstance();
     void SetupDebugMessenger();
     void CreateSurface();
     void PickPhysicalDevice();
     void CreateLogicalDevice();
+    void LoadExtensionFunctions();
     void CreateCommandPool();
 
     // helper functions
@@ -102,5 +106,7 @@ private:
     VkQueue mPresentQueue;
 
     const std::vector<const char *> mValidationLayers = {"VK_LAYER_KHRONOS_validation"};
-    const std::vector<const char *> mDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    const std::vector<const char *> mDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                                                         VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME};
+    const std::vector<const char *> mInstanceExtensions = {};
 };

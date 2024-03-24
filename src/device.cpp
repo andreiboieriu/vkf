@@ -57,6 +57,7 @@ Device::Device(std::shared_ptr<Window>& window) : mWindow{window} {
     CreateSurface();
     PickPhysicalDevice();
     CreateLogicalDevice();
+    LoadExtensionFunctions();
     CreateCommandPool();
 }
 
@@ -83,13 +84,16 @@ void Device::CreateInstance() {
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.pEngineName = "No Engine";
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.apiVersion = VK_API_VERSION_1_0;
+    appInfo.apiVersion = VK_API_VERSION_1_3;
 
     VkInstanceCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
     auto extensions = GetRequiredExtensions();
+    
+    // append user defined extensions to the required ones
+    extensions.insert(extensions.end(), mInstanceExtensions.begin(), mInstanceExtensions.end());
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -212,6 +216,10 @@ bool Device::IsDeviceSuitable(VkPhysicalDevice device) {
     QueueFamilyIndices indices = FindQueueFamilies(device);
 
     bool extensionsSupported = CheckDeviceExtensionSupport(device);
+
+    if (!extensionsSupported) {
+        throw std::runtime_error("Unsupported extensions");
+    }
 
     bool swapChainAdequate = false;
     if (extensionsSupported) {
@@ -593,3 +601,12 @@ void Device::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout
 
     EndSingleTimeCommands(commandBuffer);
 }
+
+void Device::LoadExtensionFunctions() {
+    vkCmdPushDescriptorSetKHR = (PFN_vkCmdPushDescriptorSetKHR)vkGetDeviceProcAddr(mDevice, "vkCmdPushDescriptorSetKHR");
+
+    if (!vkCmdPushDescriptorSetKHR) {
+        throw std::runtime_error("Could not get a valid function pointer for vkCmdPushDescriptorSetKHR");
+    }
+}
+
